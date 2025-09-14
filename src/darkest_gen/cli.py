@@ -13,10 +13,12 @@ import os
 # ^ biblioteca padrao do python para trabalhar com coisas do OS
 
 from darkest_gen.data import State
-
 # ^ State é uma classe contendo informações para o estado atual da aplicação
+
 from darkest_gen.data.objects import CorridorObject
 # ^ importando classes de dados sobres os diferentes objetos usados nas dungeons
+
+from darkest_gen.gen import gen
 
 APP_NAME: str = "darkest-gen"
 APP_AUTHOR: str = "kodiitulip"
@@ -39,6 +41,8 @@ if not os.path.exists(data_objects_dir):
 
 app = Typer(name=APP_NAME, help=APP_HELP)
 # ^ funcão criada com o Typer que mantem a aplicação funcionando
+app.add_typer(gen)
+# ^ adicionando a lógica da geração de dungeons
 
 
 # `@app.callback()` é um marcador para indicar ao Typer que isso é um comando
