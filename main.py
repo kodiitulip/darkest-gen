@@ -4,6 +4,8 @@ from enum import Enum
 from typing import TypedDict
 from random import randint, choice
 
+ALPHAIDS = "abcdefghijklmnopqrstuvwxyz"
+
 
 class TreasureRank(Enum):
     NONE = 0
@@ -82,7 +84,7 @@ class Corridor:
 
     # TODO: gerar um corredor aleatório com objetos
     @staticmethod
-    def generate_random() -> Corridor:
+    def generate_random(*, origin: Room, destination: Room, id: str = "A") -> Corridor:
         """Gera um corredor aleatório com seus devidos atributos"""
         ...
 
@@ -167,9 +169,7 @@ class Dungeon:
                 continue
             # aqui eh uma sala conectada por um corredor
             currroom = Room.generate_random(id=r + 1)
-            # TODO: permitir que os ids dos corredores possam receber uma letra
-            # em ordem alfabetica
-            dungeon.generate_corridor(pastroom, currroom, id="A")
+            dungeon.generate_corridor(pastroom, currroom, id=ALPHAIDS[r])
 
         return dungeon
 
