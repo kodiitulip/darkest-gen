@@ -5,3 +5,8 @@
   readme          = "README.md"
   requires-python = ">=3.12"
   version         = "0.1.0"
+dependencies = [
+    "markdown2>=2.5.4",
+    "odfpy>=1.4.1",
+    "snakemd>=2.3.0",
+]
