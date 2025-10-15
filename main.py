@@ -3,8 +3,9 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import TypedDict
 from random import randint, choice, random
+from tomllib import load
 
-ALPHAIDS = "abcdefghijklmnopqrstuvwxyz"
+ALPHAIDS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 
 class TreasureRank(Enum):
@@ -15,7 +16,7 @@ class TreasureRank(Enum):
 
 
 class DangerType(Enum):
-    NONE = ""
+    NONE = "Nenhum"
     BLEEDING = "Sangrar"
     DISEASE = "Doença"
     POISON = "Veneno"
@@ -36,6 +37,28 @@ class CorridorAttributes(TypedDict):
     traps: int
     treasure: bool
     collector: bool
+
+
+def read_room_objects() -> list[DungeonObject]:
+    with open("dungeon_objects.toml", "rb") as file:
+        toml = load(file)
+    if toml["room_objects"] is None:
+        raise ValueError(
+            'dungeon_objects.toml is invalid as it does not contain a "room_objects" Array!'
+        )
+    objs = [DungeonObject(obj) for obj in toml["room_objects"]]
+    return objs
+
+
+def read_corridor_objects() -> list[DungeonObject]:
+    with open("dungeon_objects.toml", "rb") as file:
+        toml = load(file)
+    if toml["corridor_objects"] is None:
+        raise ValueError(
+            'dungeon_objects.toml is invalid as it does not contain a "corridor_objects" Array!'
+        )
+    objs = [DungeonObject(obj) for obj in toml["corridor_objects"]]
+    return objs
 
 
 CORRIDOR_ATTRIBUTE_TABLE = {
@@ -100,94 +123,8 @@ CORRIDOR_ATTRIBUTE_TABLE = {
         fights=0, objects=0, traps=0, treasure=False, collector=True
     ),
 }
-CORRIDOR_OBJECTS_TABLE = {
-    1: DungeonObject(
-        name="Confessionário",
-        description="Lodo da Madre - Recupera 2d4 de **SAN**",
-        treasure=TreasureRank.GRAUI,
-        danger=DangerType.NONE,
-    ),
-    2: DungeonObject(
-        name="Urna de Votos",
-        description="Lodo da Madre - Aumenta o tesouro pra II",
-        treasure=TreasureRank.GRAUI,
-        danger=DangerType.NONE,
-    ),
-    3: DungeonObject(
-        name="Gabinete de Objetos",
-        description="Grampos de Ferro - Aumenta o tesouro pra II",
-        treasure=TreasureRank.GRAUI,
-        danger=DangerType.POISON,
-    ),
-    4: DungeonObject(
-        name="Estante de Livros",
-        description="",
-        treasure=TreasureRank.GRAUI,
-        danger=DangerType.DISTURB,
-    ),
-    5: DungeonObject(
-        name="Mesa de Químicos",
-        description="Ervas Batidas - Evitar o perigo",
-        treasure=TreasureRank.GRAUI,
-        danger=DangerType.DISEASE,
-    ),
-    6: DungeonObject(
-        name="Caixas e Mochilas",
-        description="",
-        treasure=TreasureRank.GRAUI,
-        danger=DangerType.NONE,
-    ),
-    7: DungeonObject(
-        name="Altar de Ossos",
-        description="Incenso de Cera - Evita o perigo e cura 2d4 **SAN**",
-        treasure=TreasureRank.NONE,
-        danger=DangerType.DISTURB,
-    ),
-    8: DungeonObject(
-        name="Haste com Cristal",
-        description="Nada - Ganha um Cristal Ígneo",
-        treasure=TreasureRank.NONE,
-        danger=DangerType.NONE,
-    ),
-    9: DungeonObject(
-        name="Parede de Escombros",
-        description="Pá e Picareta - elimina o obstáculo",
-        treasure=TreasureRank.NONE,
-        danger=DangerType.TIRE,
-    ),
-    10: DungeonObject(
-        name="Baú de Tesouro",
-        description="Grampos de Ferro - Evita o Perigo",
-        treasure=TreasureRank.GRAUII,
-        danger=DangerType.BLEEDING,
-    ),
-}
-ROOM_OBJECTS_TABLE = [
-    DungeonObject(
-        name="Altar Sacro",
-        description="Lodo da Madre - Receba +1d6 de _atk_ ou _dano_",
-        treasure=TreasureRank.NONE,
-        danger=DangerType.NONE,
-    ),
-    DungeonObject(
-        name="Pedra de Sacrifício",
-        description="Incenso de Cera",
-        treasure=TreasureRank.GRAUI,
-        danger=DangerType.DISTURB,
-    ),
-    DungeonObject(
-        name="Sarcófago",
-        description="Ervas Batidas - Aumenta tesouro para III",
-        treasure=TreasureRank.GRAUII,
-        danger=DangerType.DISEASE,
-    ),
-    DungeonObject(
-        name="Tenda de Acampamento",
-        description="Incenso de Cera",
-        treasure=TreasureRank.GRAUII,
-        danger=DangerType.DISTURB,
-    ),
-]
+CORRIDOR_OBJECTS_TABLE: list[DungeonObject] = read_corridor_objects()
+ROOM_OBJECTS_TABLE: list[DungeonObject] = read_room_objects()
 
 
 @dataclass(order=True, kw_only=True)
@@ -213,13 +150,32 @@ class Room:
         return room
 
     def get_markdown(self) -> str:
-        md = [ f"### Sala {self.id}" ] + ( [
-                f"{" "*4}- Combate",
-                *[f"{" " * 8}{i+1}. Inimigo Teste" for i in range(4)]
-            ] if self.combat else [] ) + ( [
-                f"{" "*4}- Tesouro III",
-                *[f"{" " * 8}- Item Teste" for _ in range(3)]
-            ] if self.treasure else [] )
+        md = (
+            [f"### Sala {self.id}"]
+            + (
+                [
+                    f"{" " * 4}- Combate",
+                    *[f"{" " * 8}{i+1}. Inimigo Teste" for i in range(4)],
+                ]
+                if self.combat
+                else []
+            )
+            + (
+                [
+                    f"{" " * 4}- {self.objects["name"]}\n{" " * 6}{self.objects["description"]}",
+                ]
+                if self.objects
+                else []
+            )
+            + (
+                [
+                    f"{" " * 4}- Tesouro III",
+                    *[f"{" " * 8}- Item Teste" for _ in range(3)],
+                ]
+                if self.treasure
+                else []
+            )
+        )
         return "\n\n".join(md)
 
 
@@ -230,6 +186,7 @@ class Corridor:
     destination: Room
     attributes: CorridorAttributes
     objects: list[DungeonObject] = field(default_factory=list)
+    fights: list = field(default_factory=list)
 
     def endpoints(self) -> tuple[Room, Room]:
         """Retorna as salas conectadas na ordem (origem, destino)"""
@@ -244,10 +201,30 @@ class Corridor:
             id, origin=origin, destination=destination, attributes=attr
         )
         for _ in range(attr["objects"]):
-            content_dice = randint(1, 10)
-            corr.objects.append(CORRIDOR_OBJECTS_TABLE[content_dice])
+            corr.objects.append(choice(CORRIDOR_OBJECTS_TABLE))
 
         return corr
+
+    def get_markdown(self) -> str:
+        md = (
+            [f"### Corredor {self.id}"]
+            + [
+                "\n\n".join(
+                    [f"{" "*4}- Combate"]
+                    + [f"{" "*6}{i + 1}. Inimigo Teste" for i in range(3)]
+                )
+                for _ in range(self.attributes["fights"])
+            ]
+            + [
+                "\n".join(
+                    [f"{" "*4}- {obj["name"]}"]
+                    + ([f"{" "*6}{obj["description"]}"] if obj["description"] else [])
+                )
+                for obj in self.objects
+            ]
+        )
+
+        return "\n\n".join(md)
 
 
 @dataclass(kw_only=True, order=True)
@@ -259,34 +236,13 @@ class Dungeon:
         """Retorna a quantidade de salas na masmorra"""
         return len(self.rooms)
 
-    # NOTE: remover caso não seja usado
-    def corridors_count(self) -> int:
-        """Retorna a quantidade de corredores na masmorra"""
-        return len(self.corridors)
-
-    # NOTE: remover caso não seja usado
-    def get_corridor(self, room1: Room, room2: Room) -> Corridor | None:
-        for corr in self.corridors:
-            if room1 in corr.endpoints() and room2 in corr.endpoints():
-                return corr
-        return None
-
     def insert_room(self, room: Room) -> None:
         """Adiciona uma sala à masmorra"""
         self.rooms.append(room)
 
-    # NOTE: remover caso não seja usado
-    def insert_rooms(self, rooms: list[Room]) -> None:
-        """Insere todas as salas da lista à masmorra"""
-        self.rooms.extend(rooms)
-
     def insert_corridor(self, corridor: Corridor) -> None:
         """Insere um corredor à masmorra"""
         self.corridors.append(corridor)
-
-    # NOTE: remover caso não seja usado
-    def insert_corridors(self, corridors: list[Corridor]) -> None:
-        self.corridors.extend(corridors)
 
     def generate_corridor(self, origin: Room, destination: Room, *, id: str) -> None:
         """gera um corredor conectado as salas oferecidas com o id fornecido"""
@@ -296,18 +252,6 @@ class Dungeon:
             self.insert_room(origin)
         if destination not in self.rooms:
             self.insert_room(destination)
-
-    # NOTE: remover caso não seja usado
-    def remove_room(self, room: Room) -> None:
-        self.corridors = [
-            corr for corr in self.corridors if room not in corr.endpoints()
-        ]
-        if room in self.rooms:
-            self.rooms.remove(room)
-
-    # NOTE: remover caso não seja usado
-    def remove_corridor(self, corridor: Corridor) -> None:
-        self.corridors.remove(corridor)
 
     def to_markdown(self) -> str:
         """Gera um texto em formato MARKDOWN, com as informações da masmorra formatado"""
@@ -319,6 +263,14 @@ class Dungeon:
 
 """
         doc += "\n\n".join([room.get_markdown() for room in self.rooms])
+        doc += """
+
+## Corredores
+
+---
+
+"""
+        doc += "\n\n".join([corr.get_markdown() for corr in self.corridors])
         doc += "\n"
         return doc
 

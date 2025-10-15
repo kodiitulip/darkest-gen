@@ -1,0 +1,86 @@
+# Objetos para as Salas são criados com [[room_objects]]
+# Objetos para os Corredores são criados com [[corridor_objects]]
+
+[[room_objects]]
+  name        = "Altar Sacro"                                        # Qualquer String
+  description = '''Lodo da Madre - Receba +1d6 de _atk_ ou _dano_''' # Qualquer String
+  treasure    = 0                                                    # Aceita: 0, 1, 2 ou 3
+  danger      = "Nenhum"                                             # Aceita "Nenhum", "Sangrar", "Doença", "Veneno", "Perturbar", "Cansar"
+
+[[room_objects]]
+  name        = "Pedra de Sacrifício"
+  description = '''Incenso de Cera'''
+  treasure    = 1
+  danger      = "Perturbar"
+
+[[room_objects]]
+  name        = "Sarcófago"
+  description = '''Ervas Batidas - Aumenta tesouro para III'''
+  treasure    = 2
+  danger      = "Doença"
+
+[[room_objects]]
+  name        = "Tenda de Acampamento"
+  description = '''Incenso de Cera'''
+  treasure    = 2
+  danger      = "Perturbar"
+
+[[corridor_objects]]
+  name        = "Confessionário"
+  description = '''Lodo da Madre - Recupera 2d4 de **SAN**'''
+  treasure    = 1
+  danger      = "Nenhum"
+
+[[corridor_objects]]
+  name        = "Urna de Votos"
+  description = "Lodo da Madre - Aumenta o tesouro pra II"
+  treasure    = 1
+  danger      = "Nenhum"
+
+[[corridor_objects]]
+  name        = "Gabinete de Objetos"
+  description = "Grampos de Ferro - Aumenta o tesouro pra II"
+  treasure    = 1
+  danger      = "Veneno"
+
+[[corridor_objects]]
+  name        = "Estante de Livros"
+  description = ""
+  treasure    = 1
+  danger      = "Perturbar"
+
+[[corridor_objects]]
+  name        = "Mesa de Químicos"
+  description = "Ervas Batidas - Evitar o perigo"
+  treasure    = 1
+  danger      = "Doença"
+
+[[corridor_objects]]
+  name        = "Caixas e Mochilas"
+  description = ""
+  treasure    = 1
+  danger      = "Nenhum"
+
+[[corridor_objects]]
+  name        = "Altar de Ossos"
+  description = "Incenso de Cera - Evita o perigo e cura 2d4 **SAN**"
+  treasure    = 0
+  danger      = "Perturbar"
+
+[[corridor_objects]]
+  name        = "Haste com Cristal"
+  description = "Nada - Ganha um Cristal Ígneo"
+  treasure    = 0
+  danger      = "Nenhum"
+
+[[corridor_objects]]
+  name        = "Parede de Escombros"
+  description = "Pá e Picareta - elimina o obstáculo"
+  treasure    = 0
+  danger      = "Cansar"
+
+[[corridor_objects]]
+  name        = "Baú de Tesouro"
+  description = "Grampos de Ferro - Evita o Perigo"
+  treasure    = 2
+  danger      = "Sangrar"
