@@ -1,12 +1,8 @@
 # Masmorra
 
-## Mapa
-
-Inserir Mapa aqui
-
 ## Salas
 
-***
+---
 
 ### Sala 1
 
@@ -14,37 +10,50 @@ Inserir Mapa aqui
 
 ### Sala 3
 
-- #### Combate
+    - Combate
 
-  1. ##### Inimigo Teste 1
+        1. Inimigo Teste
 
-  2. ##### Inimigo Teste 2
+        2. Inimigo Teste
 
-  3. ##### Inimigo Teste 3
+        3. Inimigo Teste
 
-  4. ##### Inimigo Teste 4
+        4. Inimigo Teste
 
-- #### Tesouro III
+    - Tesouro III
 
-  - ##### Item Teste
+        - Item Teste
 
-  - ##### Item Teste
+        - Item Teste
 
-  - ##### Item Teste
+        - Item Teste
 
 ### Sala 4
 
-- #### Combate
-
-  1. ##### Inimigo Teste 1
-
-  2. ##### Inimigo Teste 2
-
-  3. ##### Inimigo Teste 3
-
-  4. ##### Inimigo Teste 4
-
 ### Sala 5
+
+    - Combate
+
+        1. Inimigo Teste
+
+        2. Inimigo Teste
+
+        3. Inimigo Teste
+
+        4. Inimigo Teste
 
 ### Sala 6
 
+### Sala 7
+
+### Sala 8
+
+    - Combate
+
+        1. Inimigo Teste
+
+        2. Inimigo Teste
+
+        3. Inimigo Teste
+
+        4. Inimigo Teste

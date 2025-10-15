@@ -3,8 +3,6 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import TypedDict
 from random import randint, choice, random
-from snakemd import Document, Heading, MDList
-from odf.opendocument import OpenDocumentText
 
 ALPHAIDS = "abcdefghijklmnopqrstuvwxyz"
 
@@ -214,22 +212,15 @@ class Room:
             room = Room(id, combat=True)
         return room
 
-    def get_markdown(self) -> tuple[ Heading , list[ MDList ] ]:
-        heading = Heading(f"Sala {self.id}", 3)
-        combat_list = MDList( [
-            Heading("Combate\n", 4),
-            MDList( [Heading( f"Inimigo Teste {i+1}" + ( "\n" if i != 3 else "" ), 5 ) for i in range(4) if self.combat], True )
-        ] )
-        treasure_list = MDList( [
-            Heading("Tesouro III\n", 4),
-            MDList( [Heading( "Item Teste" + ( "\n" if i != 2 else "" ), 5 ) for i in range(3) if self.treasure] )
-        ] )
-        attr = []
-        if self.combat:
-            attr.append(combat_list)
-        if self.treasure:
-            attr.append(treasure_list)
-        return heading, attr
+    def get_markdown(self) -> str:
+        md = [ f"### Sala {self.id}" ] + ( [
+                f"{" "*4}- Combate",
+                *[f"{" " * 8}{i+1}. Inimigo Teste" for i in range(4)]
+            ] if self.combat else [] ) + ( [
+                f"{" "*4}- Tesouro III",
+                *[f"{" " * 8}- Item Teste" for _ in range(3)]
+            ] if self.treasure else [] )
+        return "\n\n".join(md)
 
 
 @dataclass(order=True, kw_only=True)
@@ -318,29 +309,18 @@ class Dungeon:
     def remove_corridor(self, corridor: Corridor) -> None:
         self.corridors.remove(corridor)
 
-    def to_markdown(self) -> Document:
+    def to_markdown(self) -> str:
         """Gera um texto em formato MARKDOWN, com as informações da masmorra formatado"""
-        doc = Document()
-        doc.add_heading("Masmorra")
-        doc.add_heading("Mapa", 2)
-        doc.add_raw("Inserir Mapa aqui")
-        doc.add_heading("Salas", 2)
-        doc.add_horizontal_rule()
+        doc = """# Masmorra
 
-        for room in self.rooms:
-            heading, attr_list = room.get_markdown()
-            doc.add_block(heading)
-            for attr in attr_list:
-                doc.add_block(attr)
+## Salas
 
-        doc.add_raw("")
-        doc.dump("TEST")
+---
+
+"""
+        doc += "\n\n".join([room.get_markdown() for room in self.rooms])
+        doc += "\n"
         return doc
-
-    def to_odf_doc(self) -> None:
-        doc = OpenDocumentText()
-        doc.save("TEST.odt")
-        ...
 
     @staticmethod
     def generate_random_dungeon(*, boss: bool = False) -> Dungeon:
@@ -366,8 +346,9 @@ class Dungeon:
 
 def main():
     dun = Dungeon.generate_random_dungeon()
-    print(dun.to_markdown())
-    dun.to_odf_doc()
+    doc = dun.to_markdown()
+    with open("TEST.md", "w+", encoding="utf-8") as output_file:
+        output_file.write(doc)
 
 
 if __name__ == "__main__":
